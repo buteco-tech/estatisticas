@@ -6,7 +6,11 @@ from sanic.response import json
 from oauth2client.service_account import ServiceAccountCredentials
 
 SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
-
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type",
+}
 AUTH_KEY_FILEPATH = os.getenv("AUTH_KEY_FILEPATH")
 DEBUG = os.getenv("DEBUG") in ["1", "true", "yes"]
 
@@ -21,10 +25,10 @@ def get_access_token():
 async def token(request):
     try:
         token = get_access_token()
-        return json({"token": token, "error": False})
+        return json({"token": token, "error": False}, headers=CORS_HEADERS)
     except Exception as e:
         traceback.print_exc()
-        return json({"error": True}, status=500)
+        return json({"error": True}, status=500, headers=CORS_HEADERS)
 
 
 @app.route("/status")
