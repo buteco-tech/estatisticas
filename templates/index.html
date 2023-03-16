@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Estatísticas do Buteco Tecnológico</title>
+
+    <style type="text/css">
+      html, body {
+        font-family: sans-serif;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .widget {
+        padding: 1em;
+        margin: 1em;
+        border: 1px solid #d4d2d0;
+        border-radius: 4px;
+      }
+
+      canvas {
+        max-height: 20em;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 1.2em;
+      }
+
+      .subtitle {
+        font-size: 0.8em;
+        font-weight: 300;
+      }
+
+      .no-data {
+        margin-top: 2em;
+      }
+
+      main {
+        text-align: center;
+      }
+
+      .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+      }
+    </style>
+</head>
+<body>
+  <main>
+    <h1>Estatísticas do Buteco Tecnológico</h1>
+
+    <div class="container">
+      <div class="widget">
+        <header>
+          <h2 class="title">Visualizações</h2>
+          <span class="subtitle">Por mês</span>
+        </header>
+        <canvas id="pageviews"></canvas>
+      </div>
+
+      <div class="widget">
+        <header>
+          <h2 class="title">Top Páginas</h2>
+          <span class="subtitle">Últimos 90 dias</span>
+        </header>
+        <canvas id="top-pages"></canvas>
+      </div>
+
+      <div class="widget">
+        <header>
+          <h2 class="title">Aquisição</h2>
+          <span class="subtitle">Últimos 90 dias</span>
+        </header>
+        <canvas id="acquisition"></canvas>
+      </div>
+
+      <div class="widget">
+        <header>
+          <h2 class="title">Top Países</h2>
+          <span class="subtitle">Últimos 90 dias</span>
+        </header>
+        <canvas id="top-contries"></canvas>
+      </div>
+
+      <div class="widget">
+        <header>
+          <h2 class="title">Top Sistemas Operacionais</h2>
+          <span class="subtitle">Últimos 90 dias</span>
+        </header>
+        <canvas id="top-oses"></canvas>
+      </div>
+
+      <div class="widget">
+        <header>
+          <h2 class="title">Top Browsers</h2>
+          <span class="subtitle">Últimos 90 dias</span>
+        </header>
+        <canvas id="top-browsers"></canvas>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    function makePieChart(id, data) {
+      const el = document.getElementById(id);
+
+      new Chart(el, {
+        type: 'doughnut',
+        options: {
+          cutout: '30%',
+          plugins: {
+            legend: {
+              position: 'left'
+            }
+          }
+        },
+        data: {
+          labels: data[id].dimensions,
+          datasets: [{
+            data: data[id].metrics,
+          }]
+        },
+      });
+    }
+
+
+    function makeBarChart(id, data, axis) {
+      const el = document.getElementById(id);
+
+      new Chart(el, {
+        type: 'bar',
+        options: {
+          indexAxis: axis,
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        },
+        data: {
+          labels: data[id].dimensions,
+          datasets: [{
+            data: data[id].metrics,
+          }]
+        },
+      });
+    }
+
+    function makeLineChart(id, data) {
+      const el = document.getElementById(id);
+
+      new Chart(el, {
+        type: 'line',
+        options: {
+          plugins: {
+            legend: {
+              position: 'center'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        },
+        data: {
+          tension: 0.1,
+          labels: data[id].dimensions,
+          datasets: [{
+            data: data[id].metrics,
+          }]
+        },
+      });
+    }
+
+    var data = {{ data|safe }};
+
+    makeLineChart("pageviews", data);
+    makeBarChart("top-pages", data, 'y');
+    makePieChart("acquisition", data);
+    makePieChart("top-contries", data);
+    makePieChart("top-oses", data);
+    makePieChart("top-browsers", data);
+  </script>
+</body>
+</html>

@@ -1,2 +1,7 @@
-sanic
+flask
+flask-cors
+google-analytics-data==0.16.1
+google-auth-oauthlib==1.0.0
+gunicorn
 oauth2client
+python-dateutil

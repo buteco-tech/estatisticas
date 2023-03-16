@@ -1,46 +1,16 @@
 version: '3.5'
 services:
   app:
-    image: buteco/estatisticas
+    build: .
     ports:
       - '5000:5000'
     environment:
-      AUTH_KEY_FILEPATH: /app/key.json
+      FLASK_GA4_ID: '328048912'
+      FLASK_GA4_CREDENTIALS_PATH: './key.json'
+      FLASK_CORS_CORS_ALLOW_HEADERS: 'User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type'
+      FLASK_CORS_METHODS: 'GET, OPTIONS'
+      FLASK_CORS_ORIGINS: '*'
     working_dir: /app
     volumes:
        - .:/app
-    command: python app.py
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://127.0.0.1:5000/status/']
-      timeout: 5s
-      interval: 60s
-      retries: 10
-    networks:
-      - traefik
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 128M
-        reservations:
-          cpus: '0.10'
-          memory: 64M
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik
-        #- traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
-        #- traefik.http.middlewares.https-redirect.redirectScheme.permanent=true
-        #- traefik.http.routers.web-https.rule=Host(`estatisticas.buteco.tech`)
-        #- traefik.http.routers.web-https.entrypoints=https
-        #- traefik.http.routers.web-https.tls=true
-        #- traefik.http.routers.web-https.service=app
-        - traefik.http.routers.web-http.rule=Host(`estatisticas.buteco.tech`)
-        - traefik.http.routers.web-http.entrypoints=http
-        #- traefik.http.routers.web-http.middlewares=https-redirect
-        - traefik.http.routers.web-http.service=app
-        - traefik.http.services.app.loadbalancer.server.port=5000
-
-networks:
-  traefik:
-    external: true
+    command: gunicorn -b :5000 -w 4 'server:app'
